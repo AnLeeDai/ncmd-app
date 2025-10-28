@@ -11,7 +11,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
     <div className="relative flex flex-col h-screen mx-auto max-w-7xl pb-4">
       <Header />
 
-      <ScrollShadow>
+      <ScrollShadow hideScrollBar>
         <main className="flex-grow py-4 px-2">{children}</main>
       </ScrollShadow>
 
