@@ -53,12 +53,22 @@ export default function ListMovie() {
   });
 
   const { mutate: mutateComplete } = useCompleteVideo({
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: (_data) => {
+      addToast({
+        title: "Video Completed",
+        description: "You have completed the video and earned points.",
+        color: "success",
+      });
+
+      onCloseModalWatch();
     },
 
-    onError: (error) => {
-      console.error("Error completing video view:", error);
+    onError: (_error) => {
+      addToast({
+        title: "Error",
+        description: "Failed to complete video view.",
+        color: "danger",
+      });
     },
   });
 
@@ -109,6 +119,7 @@ export default function ListMovie() {
         <WatchVideo
           isOpen={isOpenModalWatch}
           mutateCancel={mutateCancel}
+          mutateComplete={mutateComplete}
           title={isTitle}
           videoID={videoID}
           videoUrl={isVideoUrl}

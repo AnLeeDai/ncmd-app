@@ -29,7 +29,7 @@ function parseSetCookie(setCookieHeader: string) {
 
 async function forward(request: Request, ctx: Params | Promise<Params>) {
   const BACKEND_BASE =
-    process.env.LARAVEL_API_URL ?? "http://127.0.0.1:8000/api/";
+    process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api/";
 
   // `ctx` may be a promise in the Next runtime. Await it before using `params`.
   const { params } = await ctx;
