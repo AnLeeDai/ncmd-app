@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <Card className="w-[350px] mx-auto">
         <CardHeader>
           <h1 className="text-center w-full text-lg font-semibold">
-            {pathname.includes("login") ? "Welcome Back" : "Create an Account"}
+            {pathname?.includes("login") ? "Welcome Back" : "Create an Account"}
           </h1>
         </CardHeader>
 

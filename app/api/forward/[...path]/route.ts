@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-type Params = { params: { path: string[] } };
+// The Next runtime enforces its own type for the route context parameter.
+// Avoid exporting a custom type for the handler's second argument; accept
+// `any` here and narrow internally when needed.
 
 function parseSetCookie(setCookieHeader: string) {
   const parts = setCookieHeader.split(";").map((p) => p.trim());
@@ -27,7 +29,7 @@ function parseSetCookie(setCookieHeader: string) {
   return { name, value: decodeURIComponent(value), opts };
 }
 
-async function forward(request: Request, ctx: Params | Promise<Params>) {
+async function forward(request: Request, ctx: any | Promise<any>) {
   const BACKEND_BASE =
     process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api/";
 
@@ -173,26 +175,26 @@ async function forward(request: Request, ctx: Params | Promise<Params>) {
   return nextRes;
 }
 
-export async function GET(request: Request, ctx: Params) {
+export async function GET(request: Request, ctx: any) {
   return forward(request, ctx);
 }
 
-export async function POST(request: Request, ctx: Params) {
+export async function POST(request: Request, ctx: any) {
   return forward(request, ctx);
 }
 
-export async function PUT(request: Request, ctx: Params) {
+export async function PUT(request: Request, ctx: any) {
   return forward(request, ctx);
 }
 
-export async function PATCH(request: Request, ctx: Params) {
+export async function PATCH(request: Request, ctx: any) {
   return forward(request, ctx);
 }
 
-export async function DELETE(request: Request, ctx: Params) {
+export async function DELETE(request: Request, ctx: any) {
   return forward(request, ctx);
 }
 
-export async function OPTIONS(request: Request, ctx: Params) {
+export async function OPTIONS(request: Request, ctx: any) {
   return forward(request, ctx);
 }
