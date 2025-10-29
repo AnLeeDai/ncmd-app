@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addToast } from "@heroui/toast";
 import { useRouter } from "next/navigation";
 
+import instance from "@/libs/instance";
+import mapUser from "@/api/services/users";
 import { pathNameConfig } from "@/config/site";
 import { LoginRequestInterface } from "@/api/interfaces/login-interface";
 
@@ -20,7 +22,7 @@ const schema = zod.object({
 export default function FormLogin() {
   const router = useRouter();
 
-  const { handleSubmit, control } = useForm<LoginRequestInterface>({
+  const { handleSubmit, control, formState } = useForm<LoginRequestInterface>({
     defaultValues: {
       email: "",
       password: "",
@@ -30,24 +32,11 @@ export default function FormLogin() {
 
   const onSubmit = async (data: LoginRequestInterface) => {
     try {
-      const response = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const res = await instance.post("/public/auth/login", data);
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => null);
-        const msg = errorBody?.message || "Network response was not ok";
+      const resData = res.data;
 
-        throw new Error(msg);
-      }
-
-      const resData = await response.json();
-
-      const user = resData?.user ?? resData?.data?.user ?? null;
+      const user = mapUser(resData);
 
       const email = user?.email;
 
@@ -95,8 +84,13 @@ export default function FormLogin() {
         )}
       />
 
-      <Button fullWidth color="primary" type="submit">
-        Submit
+      <Button
+        fullWidth
+        color="primary"
+        isLoading={formState.isSubmitting}
+        type="submit"
+      >
+        Login
       </Button>
     </Form>
   );

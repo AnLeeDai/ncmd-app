@@ -12,7 +12,7 @@ export interface VideosInterfaceResponse {
 }
 
 export interface VideoWatchInterfaceRequest {
-  videoId: number;
+  ad_id: number;
 }
 
 export interface VideosStartInterfaceResponse {

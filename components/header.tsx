@@ -73,9 +73,28 @@ export default function Header() {
     try {
       const res = await logout();
 
-      if (!res || !res.ok) {
-        const body = res ? await res.json().catch(() => null) : null;
+      if (!res) {
+        addToast({
+          title: "Logout failed",
+          description: "Could not log out.",
+          color: "danger",
+        });
 
+        return;
+      }
+
+      let ok = false;
+      let body: any = null;
+
+      if ((res as any).ok !== undefined) {
+        ok = (res as any).ok;
+        body = await (res as any).json().catch(() => null);
+      } else if ((res as any).status !== undefined) {
+        ok = (res as any).status >= 200 && (res as any).status < 300;
+        body = (res as any).data ?? null;
+      }
+
+      if (!ok) {
         addToast({
           title: "Logout failed",
           description: body?.message || "Could not log out.",
@@ -121,7 +140,7 @@ export default function Header() {
                 avatarProps={{
                   src: user?.avatar ?? "https://i.pravatar.cc/150?u=default",
                 }}
-                description={user?.email ?? ""}
+                description={`Points: ${user?.total_points ?? 0}`}
                 name={user?.name ?? "User"}
               />
             </DropdownTrigger>

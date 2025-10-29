@@ -22,6 +22,7 @@ export default function WatchVideo({
 }: WatchVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const lastTimeRef = useRef(0);
+
   const [playing, setPlaying] = useState(false);
   const [sec, setSec] = useState(0);
   const [duration, setDuration] = useState<number | null>(null);

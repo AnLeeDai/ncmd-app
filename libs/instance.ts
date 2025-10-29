@@ -1,18 +1,22 @@
 import { addToast } from "@heroui/toast";
 import axios from "axios";
 
+const defaultBase =
+  process.env.NODE_ENV === "development"
+    ? "/api/forward"
+    : (process.env.NEXT_PUBLIC_API_URL ?? "/api");
+
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: defaultBase,
   timeout: 3000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
   },
   withCredentials: true,
 });
 
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   function (response) {
     return response;
   },
