@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     if (token) {
       try {
-        await fetch(`${BACKEND_BASE}public/auth/logout`, {
+        await fetch(`${BACKEND_BASE}private/auth/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
     res.headers.set(
       "Set-Cookie",
-      `token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`
+      `token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
     );
 
     return res;

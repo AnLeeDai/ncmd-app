@@ -1,15 +1,20 @@
 "use client";
 
-import { User } from "@heroui/user";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import { User } from "@heroui/user";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
+import { addToast } from "@heroui/toast";
+import { Skeleton } from "@heroui/skeleton";
 
 import { pathNameConfig } from "@/config/site";
+import useAuth from "@/api/hooks/use-auth";
 
 function Logo() {
   return (
@@ -61,41 +66,96 @@ const items = [
 ];
 
 export default function Header() {
-  const handlerLogout = () => {};
+  const router = useRouter();
+  const { user, logout, isLoading } = useAuth();
+
+  const handlerLogout = useCallback(async () => {
+    try {
+      const res = await logout();
+
+      if (!res || !res.ok) {
+        const body = res ? await res.json().catch(() => null) : null;
+
+        addToast({
+          title: "Logout failed",
+          description: body?.message || "Could not log out.",
+          color: "danger",
+        });
+
+        return;
+      }
+
+      addToast({
+        title: "Logged out",
+        description: "You have been logged out.",
+        color: "success",
+      });
+
+      router.push(pathNameConfig.login.url);
+    } catch (error: any) {
+      addToast({
+        title: "Logout error",
+        description: error?.message || "An error occurred.",
+        color: "danger",
+      });
+    }
+  }, [logout, router]);
 
   return (
     <header className="py-4 px-2">
       <div className="flex items-center justify-between gap-4">
         <Logo />
 
-        <Dropdown backdrop="blur" placement="bottom-end">
-          <DropdownTrigger>
-            <User
-              avatarProps={{
-                src: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-              }}
-              description="Product Designer"
-              name="Jane Doe"
-            />
-          </DropdownTrigger>
+        {isLoading ? (
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <div className="flex flex-col">
+              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </div>
+        ) : user ? (
+          <Dropdown backdrop="blur" placement="bottom-end">
+            <DropdownTrigger>
+              <User
+                avatarProps={{
+                  src: user?.avatar ?? "https://i.pravatar.cc/150?u=default",
+                }}
+                description={user?.email ?? ""}
+                name={user?.name ?? "User"}
+              />
+            </DropdownTrigger>
 
-          <DropdownMenu
-            aria-label="Dynamic Actions"
-            items={items}
-            onAction={(key) => key === "logout" && handlerLogout()}
-          >
-            {(item) => (
-              <DropdownItem
-                key={item.key}
-                className={item.key === "logout" ? "text-danger" : ""}
-                color={item.key === "logout" ? "danger" : "default"}
-                href={item.url}
-              >
-                {item.label}
-              </DropdownItem>
-            )}
-          </DropdownMenu>
-        </Dropdown>
+            <DropdownMenu
+              aria-label="Dynamic Actions"
+              items={items}
+              onAction={(key) => key === "logout" && handlerLogout()}
+            >
+              {(item) => (
+                <DropdownItem
+                  key={item.key}
+                  className={item.key === "logout" ? "text-danger" : ""}
+                  color={item.key === "logout" ? "danger" : "default"}
+                  href={item.url}
+                >
+                  {item.label}
+                </DropdownItem>
+              )}
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link
+              className="text-sm text-primary"
+              href={pathNameConfig.login.url}
+            >
+              Login
+            </Link>
+            <Link className="text-sm" href={pathNameConfig.register.url}>
+              Sign up
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

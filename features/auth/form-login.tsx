@@ -7,7 +7,9 @@ import { Controller, useForm } from "react-hook-form";
 import zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addToast } from "@heroui/toast";
+import { useRouter } from "next/navigation";
 
+import { pathNameConfig } from "@/config/site";
 import { LoginRequestInterface } from "@/api/interfaces/login-interface";
 
 const schema = zod.object({
@@ -16,6 +18,8 @@ const schema = zod.object({
 });
 
 export default function FormLogin() {
+  const router = useRouter();
+
   const { handleSubmit, control } = useForm<LoginRequestInterface>({
     defaultValues: {
       email: "",
@@ -52,6 +56,8 @@ export default function FormLogin() {
         description: email ? `Welcome back, ${email}!` : "Welcome back!",
         color: "success",
       });
+
+      router.push(pathNameConfig.videos.url);
     } catch (error: any) {
       addToast({
         title: "Login Failed",

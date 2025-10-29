@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const payload = await request.json();
 
-  const BACKEND_BASE = process.env.LARAVEL_API_URL ?? "http://127.0.0.1:8000/api/";
+  const BACKEND_BASE =
+    process.env.LARAVEL_API_URL ?? "http://127.0.0.1:8000/api/";
 
   try {
     const url = `${BACKEND_BASE}public/auth/login`;
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     if (!laravelRes.ok) {
       return NextResponse.json(
         { message: body?.message || "Login failed", body },
-        { status: laravelRes.status }
+        { status: laravelRes.status },
       );
     }
 
@@ -31,13 +32,13 @@ export async function POST(request: Request) {
 
     const res = NextResponse.json(
       { user, message: body?.message || "OK" },
-      { status: 200 }
+      { status: 200 },
     );
 
     if (token) {
       res.headers.set(
         "Set-Cookie",
-        `token=${token}; Path=/; HttpOnly; SameSite=Lax`
+        `token=${token}; Path=/; HttpOnly; SameSite=Lax`,
       );
     }
 
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: error?.message || "Internal error", ...devExtra },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
