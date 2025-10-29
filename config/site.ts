@@ -6,6 +6,11 @@ export const siteConfig = {
 };
 
 export const pathNameConfig = {
+  // auth
+  login: { url: "/login" },
+  register: { url: "/register" },
+
+  // main
   videos: { url: "/videos" },
   profile: { url: "/profile" },
   wheels: { url: "/wheels" },
