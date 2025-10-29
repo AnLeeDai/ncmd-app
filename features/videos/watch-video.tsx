@@ -10,7 +10,8 @@ interface WatchVideoProps {
   videoUrl?: string;
   videoID: number;
   captionsUrl?: string;
-  mutateCancel: (args: { videoId: number }) => void;
+  mutateCancel: (args: { ad_id: number }) => void;
+  mutateComplete: (args: { ad_id: number }) => void;
 }
 
 export default function WatchVideo({
@@ -18,14 +19,17 @@ export default function WatchVideo({
   title,
   videoUrl,
   mutateCancel,
+  mutateComplete,
   videoID,
 }: WatchVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const lastTimeRef = useRef(0);
+
   const [playing, setPlaying] = useState(false);
   const [sec, setSec] = useState(0);
   const [duration, setDuration] = useState<number | null>(null);
   const [muted, setMuted] = useState(false);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -42,9 +46,26 @@ export default function WatchVideo({
   }, [isOpen, muted]);
 
   useEffect(() => {
+    // reset completed flag when a new video is opened
+    if (isOpen) completedRef.current = false;
+  }, [isOpen, videoID]);
+
+  useEffect(() => {
     const v = videoRef.current;
 
     if (!v) return;
+    const onEnded = () => {
+      // when video finishes, call complete mutation
+      try {
+        if (!completedRef.current) {
+          completedRef.current = true;
+          mutateComplete({ ad_id: videoID });
+        }
+      } catch {
+        // ignore
+      }
+    };
+
     const onMeta = () =>
       setDuration(Number.isFinite(v.duration) ? Math.floor(v.duration) : null);
     const onTime = () => {
@@ -56,9 +77,9 @@ export default function WatchVideo({
     const onSeeking = () => {
       const safe = lastTimeRef.current || 0;
 
-      requestAnimationFrame(() =>
-        Math.abs(v.currentTime - safe) > 0.5 ? (v.currentTime = safe) : null
-      );
+      requestAnimationFrame(() => {
+        if (Math.abs(v.currentTime - safe) > 0.5) v.currentTime = safe;
+      });
     };
 
     v.addEventListener("loadedmetadata", onMeta);
@@ -66,6 +87,7 @@ export default function WatchVideo({
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("seeking", onSeeking);
+    v.addEventListener("ended", onEnded);
 
     return () => {
       v.removeEventListener("loadedmetadata", onMeta);
@@ -73,6 +95,7 @@ export default function WatchVideo({
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("seeking", onSeeking);
+      v.removeEventListener("ended", onEnded);
     };
   }, [videoUrl]);
 
@@ -127,7 +150,7 @@ export default function WatchVideo({
   };
 
   const handleCancelVideo = () => {
-    mutateCancel({ videoId: videoID });
+    mutateCancel({ ad_id: videoID });
   };
 
   return (

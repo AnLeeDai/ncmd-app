@@ -11,7 +11,7 @@ import VideoCard from "./video-card";
 import ListMovieSkeleton from "./list-movie-skeleton";
 
 import { useVideos } from "@/api/hooks/use-videos";
-// import { useCompleteVideo } from "@/api/hooks/use-complete-video";
+import { useCompleteVideo } from "@/api/hooks/use-complete-video";
 import { useStartVideo } from "@/api/hooks/use-start-video";
 import { useCancelVideo } from "@/api/hooks/use-cancel-video";
 
@@ -52,15 +52,25 @@ export default function ListMovie() {
     },
   });
 
-  // const { mutate: mutateComplete } = useCompleteVideo({
-  //   onSuccess: (data) => {
-  //     console.log(data);
-  //   },
+  const { mutate: mutateComplete } = useCompleteVideo({
+    onSuccess: (_data) => {
+      addToast({
+        title: "Video Completed",
+        description: "You have completed the video and earned points.",
+        color: "success",
+      });
 
-  //   onError: (error) => {
-  //     console.error("Error completing video view:", error);
-  //   },
-  // });
+      onCloseModalWatch();
+    },
+
+    onError: (_error) => {
+      addToast({
+        title: "Error",
+        description: "Failed to complete video view.",
+        color: "danger",
+      });
+    },
+  });
 
   const { mutate: mutateCancel } = useCancelVideo({
     onSuccess: () => {
@@ -99,7 +109,7 @@ export default function ListMovie() {
   const handleWatchMovie = (url: string, title: string, id: number) => {
     setIsVideoUrl(url);
     setIsTitle(title);
-    mutateStart({ videoId: id });
+    mutateStart({ ad_id: id });
     setVideoID(id);
   };
 
@@ -109,6 +119,7 @@ export default function ListMovie() {
         <WatchVideo
           isOpen={isOpenModalWatch}
           mutateCancel={mutateCancel}
+          mutateComplete={mutateComplete}
           title={isTitle}
           videoID={videoID}
           videoUrl={isVideoUrl}
