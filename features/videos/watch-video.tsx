@@ -15,7 +15,6 @@ interface WatchVideoProps {
 
 export default function WatchVideo({
   isOpen,
-  onClose,
   title,
   videoUrl,
   mutateCancel,
