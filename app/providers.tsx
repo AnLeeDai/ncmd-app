@@ -40,7 +40,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider navigate={router.push}>
-        <NextThemesProvider {...themeProps}>
+        <NextThemesProvider {...themeProps} defaultTheme="light">
           <ToastProvider placement="top-center" />
           {children}
           <Analytics />

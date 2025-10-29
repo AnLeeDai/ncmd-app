@@ -33,8 +33,9 @@ axios.interceptors.response.use(
         description: error.message,
       });
     }
+
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;

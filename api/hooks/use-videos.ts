@@ -1,7 +1,7 @@
 import {
-  useQuery,
-  UseQueryOptions,
-  UseQueryResult,
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+  InfiniteData,
 } from "@tanstack/react-query";
 
 import { fetchVideos } from "@/api/services/videos";
@@ -14,14 +14,32 @@ import { VideosInterfaceResponse } from "@/api/interfaces/videos-interface";
 export type ApiError = ErrorResponseInterface | { message: string };
 
 export const useVideos = (
-  options?: UseQueryOptions<
+  options?: any,
+): UseInfiniteQueryResult<
+  InfiniteData<ResponseInterface<VideosInterfaceResponse[]>, number>,
+  ApiError
+> => {
+  return useInfiniteQuery<
     ResponseInterface<VideosInterfaceResponse[]>,
-    ApiError
-  >
-): UseQueryResult<ResponseInterface<VideosInterfaceResponse[]>, ApiError> => {
-  return useQuery<ResponseInterface<VideosInterfaceResponse[]>, ApiError>({
+    ApiError,
+    InfiniteData<ResponseInterface<VideosInterfaceResponse[]>, number>,
+    readonly unknown[],
+    number
+  >({
     queryKey: ["videos"],
-    queryFn: fetchVideos,
+    queryFn: ({ pageParam }) => fetchVideos(pageParam as number),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _pages) => {
+      const pagination = (
+        lastPage as ResponseInterface<VideosInterfaceResponse[]>
+      ).pagination;
+
+      if (pagination && pagination.current_page < pagination.last_page) {
+        return pagination.current_page + 1;
+      }
+
+      return undefined;
+    },
     ...options,
   });
 };
